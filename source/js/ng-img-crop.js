@@ -44,9 +44,13 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
           if(angular.isDefined(scope.resultImageData)) {
             scope.resultImageData=resultImageObj.imageData;
           }
+
           updateAreaCoords(scope);
-          scope.onChange({$dataURI: scope.resultImage});
-          scope.onChange({$imageData: scope.resultImageData});
+          scope.onChange({
+            $dataURI: scope.resultImage,
+            $imageData: scope.resultImageData
+          });
+
         }
       };
 
