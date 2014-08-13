@@ -177,6 +177,10 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
       return retObj;
     };
 
+    this.getAreaCoords=function() {
+      return theArea.getPosition()
+    }
+
     this.setNewImageSource=function(imageSource) {
       image=null;
       resetCropHost();

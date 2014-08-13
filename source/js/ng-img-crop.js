@@ -9,6 +9,7 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
       resultImageData: '=',
 
       changeOnFly: '=',
+      areaCoords: '=',
       areaType: '@',
       areaMinSize: '=',
       resultImageSize: '=',
@@ -43,10 +44,16 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
           if(angular.isDefined(scope.resultImageData)) {
             scope.resultImageData=resultImageObj.imageData;
           }
+          updateAreaCoords(scope);
           scope.onChange({$dataURI: scope.resultImage});
           scope.onChange({$imageData: scope.resultImageData});
         }
       };
+
+      var updateAreaCoords=function(scope) {
+        var areaCoords=cropHost.getAreaCoords();
+        scope.areaCoords=areaCoords;
+      }
 
       // Wrapper to safely exec functions within $apply on a running $digest cycle
       var fnSafeApply=function(fn) {
