@@ -28,7 +28,8 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
     // Object Pointers
     var ctx=null,
         image=null,
-        theArea=null;
+        theArea=null,
+        self=this;
 
     // Dimensions
     var minCanvasDims=[100,100],
@@ -85,9 +86,18 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
         }
         elCanvas.prop('width',canvasDims[0]).prop('height',canvasDims[1]).css({'margin-left': -canvasDims[0]/2+'px', 'margin-top': -canvasDims[1]/2+'px'});
 
-        theArea.setSize({ w: Math.min(200, ctx.canvas.width/2),
-                          h: Math.min(200, ctx.canvas.height/2)});
+        var cw = ctx.canvas.width;
+        var ch = ctx.canvas.height;
 
+
+        var areaType = self.getAreaType();
+        // enforce 1:1 aspect ratio for square-like selections
+        if ((areaType === 'circle') || (areaType === 'square')) {
+          cw = ch = Math.min(cw, ch);
+        }
+
+        theArea.setSize({ w: Math.min(200, cw / 2),
+                          h: Math.min(200, ch / 2)});
         //TODO: set top left corner point
         theArea.setCenterPoint({x: ctx.canvas.width/2, y: ctx.canvas.height/2});
 
@@ -281,6 +291,11 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
         drawScene();
       }
     };
+
+    // returns a string of the selection area's type
+    this.getAreaType=function() {
+      return theArea.getType();
+    }
 
     this.setAreaType=function(type) {
       var center = theArea.getCenterPoint();
