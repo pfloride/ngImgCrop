@@ -5,7 +5,7 @@
  * Copyright (c) 2014 Alex Kaul
  * License: MIT
  *
- * Generated at Sunday, August 17th, 2014, 9:58:38 AM
+ * Generated at Sunday, August 17th, 2014, 1:32:08 PM
  */
 (function() {
 'use strict';
@@ -38,6 +38,11 @@ crop.factory('cropAreaCircle', ['cropArea', function(CropArea) {
   };
 
   CropAreaCircle.prototype = new CropArea();
+
+  // return a type string
+  CropAreaCircle.prototype.getType = function() {
+    return 'circle';
+  }
 
   CropAreaCircle.prototype._calcCirclePerimeterCoords=function(angleDegrees) {
     var c = this.getCenterPoint();
@@ -196,6 +201,11 @@ crop.factory('cropAreaRectangle', ['cropArea', function(CropArea) {
   };
 
   CropAreaRectangle.prototype = new CropArea();
+
+  // return a type string
+  CropAreaRectangle.prototype.getType = function() {
+    return 'rectangle';
+  }
 
   CropAreaRectangle.prototype._calcRectangleCorners=function() {
     var size = this.getSize();
@@ -378,6 +388,11 @@ crop.factory('cropAreaSquare', ['cropArea', 'cropAreaRectangle', function(CropAr
 
   CropAreaSquare.prototype = new CropAreaRectangle();
 
+  // return a type string
+  CropAreaSquare.prototype.getType = function() {
+    return 'square';
+  }
+
   // override rectangle's mouse move method
   CropAreaSquare.prototype.processMouseMove=function(mouseCurX, mouseCurY) {
     var cursor='default';
@@ -536,6 +551,12 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     this.setSize(this._minSize);
   };
 
+  // return a type string
+  CropArea.prototype.getType = function() {
+    //default to circle
+    return 'circle';
+  }
+
   /* FUNCTIONS */
   CropArea.prototype._preventBoundaryCollision=function(size) {
     var canvasH=this._ctx.canvas.height,
@@ -588,9 +609,16 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
                    w: se.x - nw.x,
                    h: se.y - nw.y};
       }
-
     }
 
+    //finally, enforce 1:1 aspect ratio for sqaure-like selections
+    if (this.getType() === "circle" || this.getType() === "square")
+    {
+      newSize = {x: newSize.x,
+                 y: newSize.y,
+                 w: Math.min(newSize.w, newSize.h),
+                 h: Math.min(newSize.w, newSize.h)};
+    }
     return newSize;
   };
 
@@ -787,7 +815,8 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
     // Object Pointers
     var ctx=null,
         image=null,
-        theArea=null;
+        theArea=null,
+        self=this;
 
     // Dimensions
     var minCanvasDims=[100,100],
@@ -844,9 +873,17 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
         }
         elCanvas.prop('width',canvasDims[0]).prop('height',canvasDims[1]).css({'margin-left': -canvasDims[0]/2+'px', 'margin-top': -canvasDims[1]/2+'px'});
 
-        theArea.setSize({ w: Math.min(200, ctx.canvas.width/2),
-                          h: Math.min(200, ctx.canvas.height/2)});
+        var cw = ctx.canvas.width;
+        var ch = ctx.canvas.height;
 
+        var areaType = self.getAreaType();
+        // enforce 1:1 aspect ratio for square-like selections
+        if ((areaType === 'circle') || (areaType === 'square')) {
+          cw = ch = Math.min(cw, ch);
+        }
+
+        theArea.setSize({ w: Math.min(200, cw / 2),
+                          h: Math.min(200, ch / 2)});
         //TODO: set top left corner point
         theArea.setCenterPoint({x: ctx.canvas.width/2, y: ctx.canvas.height/2});
 
@@ -1039,6 +1076,11 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
         drawScene();
       }
     };
+
+    // returns a string of the selection area's type
+    this.getAreaType=function() {
+      return theArea.getType();
+    }
 
     this.setAreaType=function(type) {
       var center = theArea.getCenterPoint();
