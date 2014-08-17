@@ -5,7 +5,7 @@
  * Copyright (c) 2014 Alex Kaul
  * License: MIT
  *
- * Generated at Saturday, August 16th, 2014, 9:58:35 PM
+ * Generated at Sunday, August 17th, 2014, 9:58:38 AM
  */
 (function() {
 'use strict';
@@ -123,7 +123,6 @@ crop.factory('cropAreaCircle', ['cropArea', function(CropArea) {
         res=true;
     }
 
-    this._dontDragOutside();
     angular.element(this._ctx.canvas).css({'cursor': cursor});
 
     return res;
@@ -463,7 +462,6 @@ crop.factory('cropAreaSquare', ['cropArea', 'cropAreaRectangle', function(CropAr
       }
     }
 
-    this._dontDragOutside();
     angular.element(this._ctx.canvas).css({'cursor': cursor});
 
     return res;
