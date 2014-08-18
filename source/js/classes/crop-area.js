@@ -45,15 +45,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     return this._southEastBound(this.getSize());
   };
 
-  CropArea.prototype.getPosition = function () {
-    return {
-      left: this._x - this._size/2,
-      top: this._y - this._size/2,
-      width: this._size,
-      height: this._size,
-    }
-  }
-
   CropArea.prototype.getMinSize = function () {
     return this._minSize;
   };
