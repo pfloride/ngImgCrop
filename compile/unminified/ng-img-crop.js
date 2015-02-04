@@ -2,18 +2,15 @@
  * ngImgCrop v0.2.0
  * https://github.com/alexk111/ngImgCrop
  *
- * Copyright (c) 2014 Alex Kaul
+ * Copyright (c) 2015 Alex Kaul
  * License: MIT
  *
- * Generated at Monday, September 15th, 2014, 1:36:30 PM
+ * Generated at Thursday, February 5th, 2015, 12:28:01 AM
  */
 (function() {
 'use strict';
 
-'use strict';
-
 var crop = angular.module('ngImgCrop', []);
-'use strict';
 
 crop.factory('cropAreaCircle', ['cropArea', function(CropArea) {
   var CropAreaCircle = function() {
@@ -173,12 +170,10 @@ crop.factory('cropAreaCircle', ['cropArea', function(CropArea) {
     this._posDragStartY = 0;
   };
 
-
   return CropAreaCircle;
 }]);
 
 
-'use strict';
 
 crop.factory('cropAreaRectangle', ['cropArea', function(CropArea) {
   var CropAreaRectangle = function() {
@@ -382,11 +377,9 @@ crop.factory('cropAreaRectangle', ['cropArea', function(CropArea) {
     this._posDragStartY = 0;
   };
 
-
   return CropAreaRectangle;
 }]);
 
-'use strict';
 
 crop.factory('cropAreaSquare', ['cropArea', 'cropAreaRectangle', function(CropArea, CropAreaRectangle) {
   var CropAreaSquare = function() {
@@ -492,7 +485,6 @@ crop.factory('cropAreaSquare', ['cropArea', 'cropAreaRectangle', function(CropAr
   return CropAreaSquare;
 }]);
 
-'use strict';
 
 crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
   var CropArea = function(ctx, events) {
@@ -566,7 +558,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
     this.setSize(this._minSize);
   };
 
-
   // return a type string
   CropArea.prototype.getType = function() {
     //default to circle
@@ -577,7 +568,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
   CropArea.prototype._preventBoundaryCollision=function(size) {
     var canvasH=this._ctx.canvas.height,
         canvasW=this._ctx.canvas.width;
-
 
     var nw = {x: size.x, y: size.y};
     var se = this._southEastBound(size);
@@ -692,7 +682,6 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
   return CropArea;
 }]);
 
-'use strict';
 
 crop.factory('cropCanvas', [function() {
   // Shape = Array of [x,y]; [0, 0] - center
@@ -745,7 +734,6 @@ crop.factory('cropCanvas', [function() {
         ctx.closePath();
         ctx.restore();
     };
-
 
     /* Icons */
 
@@ -823,7 +811,6 @@ crop.factory('cropCanvas', [function() {
   };
 }]);
 
-'use strict';
 
 crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'cropAreaRectangle', function($document, CropAreaCircle, CropAreaSquare, CropAreaRectangle) {
   /* STATIC FUNCTIONS */
@@ -914,7 +901,6 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
         var cw = ctx.canvas.width;
         var ch = ctx.canvas.height;
 
-
         var areaType = self.getAreaType();
         // enforce 1:1 aspect ratio for square-like selections
         if ((areaType === 'circle') || (areaType === 'square')) {
@@ -987,8 +973,7 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
       }
     };
 
-
-    this.getResultImage=function() {
+    this.getResultImageDataURI=function() {
       var temp_ctx, temp_canvas;
       temp_canvas = angular.element('<canvas></canvas>')[0];
       temp_ctx = temp_canvas.getContext('2d');
@@ -996,14 +981,10 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
       temp_canvas.width = ris.w;
       temp_canvas.height = ris.h;
       var center = theArea.getCenterPoint();
-      var retObj = {dataURI: null,
-                    imageData: null};
       if(image!==null){
         temp_ctx.drawImage(image, (center.x-theArea.getSize().w/2)*(image.width/ctx.canvas.width), (center.y-theArea.getSize().h/2)*(image.height/ctx.canvas.height), theArea.getSize().w*(image.width/ctx.canvas.width), theArea.getSize().h*(image.height/ctx.canvas.height), 0, 0, ris.w, ris.h);
-        retObj.dataURI = temp_canvas.toDataURL();
-        retObj.imageData = temp_canvas.getContext("2d").getImageData(0, 0, temp_canvas.width, temp_canvas.height);
       }
-      return retObj;
+      return temp_canvas.toDataURL();
     };
 
     this.setNewImageSource=function(imageSource) {
@@ -1202,7 +1183,6 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
 
 }]);
 
-'use strict';
 
 crop.factory('cropPubSub', [function() {
   return function() {
@@ -1226,7 +1206,6 @@ crop.factory('cropPubSub', [function() {
     };
   };
 }]);
-'use strict';
 
 crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeout, CropHost, CropPubSub) {
   return {
@@ -1234,7 +1213,6 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
     scope: {
       image: '=',
       resultImage: '=',
-      resultImageData: '=',
 
       changeOnFly: '=',
       areaType: '@',
@@ -1261,21 +1239,16 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
       // Store Result Image to check if it's changed
       var storedResultImage;
 
-      var updateResultImage=function(scope) {
-        var resultImageObj=cropHost.getResultImage();
-        var resultImage = resultImageObj.dataURI;
-        if(storedResultImage!==resultImage) {
-          storedResultImage=resultImage;
-          if(angular.isDefined(scope.resultImage)) {
-            scope.resultImage=resultImage;
-          }
-          if(angular.isDefined(scope.resultImageData)) {
-            scope.resultImageData=resultImageObj.imageData;
-          }
-          scope.onChange({$dataURI: scope.resultImage});
-          scope.onChange({$imageData: scope.resultImageData});
-        }
-      };
+       var updateResultImage=function(scope) {
+        var resultImage=cropHost.getResultImageDataURI();
+         if(storedResultImage!==resultImage) {
+           storedResultImage=resultImage;
+           if(angular.isDefined(scope.resultImage)) {
+             scope.resultImage=resultImage;
+           }
+           scope.onChange({$dataURI: scope.resultImage});
+         }
+       };
 
       // Wrapper to safely exec functions within $apply on a running $digest cycle
       var fnSafeApply=function(fn) {
